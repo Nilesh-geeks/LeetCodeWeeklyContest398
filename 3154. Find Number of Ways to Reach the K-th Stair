@@ -1,0 +1,64 @@
+
+Problem:: 3154. Find Number of Ways to Reach the K-th Stair
+Hard
+You are given a non-negative integer k. There exists a staircase with an infinite number of stairs, with the lowest stair numbered 0.
+
+Alice has an integer jump, with an initial value of 0. She starts on stair 1 and wants to reach stair k using any number of operations. If she is on stair i, in one operation she can:
+
+Go down to stair i - 1. This operation cannot be used consecutively or on stair 0.
+Go up to stair i + 2jump. And then, jump becomes jump + 1.
+Return the total number of ways Alice can reach stair k.
+
+Note that it is possible that Alice reaches the stair k, and performs some operations to reach the stair k again.
+
+
+Intuition::
+    You can jump forward by pow(2,jump) and come back by only 1 pos 
+    so if you are position of i(position)>=k+2 you cannot come back 
+    to k with same call position so then it's of no use to moe forward
+    with this recurive traversal so return 0.
+    this is base case which will is very important for recursive function to terminate.
+
+Approach::
+    Use Dp to memomoize the solution For this make use 
+    Unordered_map for space effective solution otherwise you have to 
+    make 10^9 3d vector which is very large space
+    Simply go with the condition that you cannot make two back jump
+    consecutively and at zero position you cannot make back jump
+    and other condition to jump with pos+pow(2,jump).
+
+Complexity::
+Time complexity:
+    O(32*32*32*2) // 32 Jump 32*32 is of i postion 2 is down variable 
+    how this 32 come you must be wondering so , 1+2^x == k
+    10^9 is max value of k so as stated position cannot be 
+    greater k+2 
+    we can say that 2^x == 10^9 
+    10^9 is value of integer and 2^32 is max value of integer
+    so by this 32 
+
+Space complexity:
+    O(32*32*32*2) // 32is of jump variable 32*32 is of i(position) 2 is down variable
+
+
+Code::
+class Solution {
+    unordered_map<int,unordered_map<int,unordered_map<int,int>>>dp;
+    int solve( int k , int jump , int i , bool down ){
+        if(i>=k+2)return 0; // base Case
+        if(dp.count(jump) && dp[jump].count(i) && dp[jump][i].count(down))return dp[jump][i][down]; // return ans if stored previously
+        int ans =0;
+        if(i==k){
+            ans+=1;
+            }
+        if(i>0 && down){
+            ans += solve( k , jump , i-1, !down ); // down jump
+        }
+        ans += solve(k , jump+1 , i+pow(2,jump) ,1 ); // up jump
+        return dp[jump][i][down] = ans; // store ans
+    }
+public:
+    int waysToReachStair(int k) {
+        return solve(k , 0 , 1, 1 );
+}
+};
